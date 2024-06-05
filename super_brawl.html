@@ -23,10 +23,6 @@ var config = {
         arcade: {
             gravity: { y: 300 },
             debug: true
-        },
-        matter: {
-            gravity: { y: 0.5 },
-            debug: true
         }
     },
     scene: {
@@ -78,35 +74,34 @@ function create ()
     platforms.create(750, 220, 'ground');
 
     // The player and its settings
-    player = this.physics.add.sprite(100, 450, 'dude', 'stand1');
+    player = this.physics.add.sprite(100, 460, 'dude', 'stand1');
 
     //  Player physics properties. Give the little guy a slight bounce.
     player.setBounce(0);
     player.setCollideWorldBounds(true);
 
-    //  Our player animations, turning, walking left and walking right.\
-    player.animations.add(
-        'stand', 
-        Phaser.Animation.generateFrameNames('stand', 1), 
-        15, 
-        true
-    );
-    player.animations.add(
-        'sprint', 
-        Phaser.Animation.generateFrameNames('sprint', 1, 8), 
-        15, 
-        true
-    );
-    player.animations.add(
-        'jump',
-        Phaser.Animation.generateFrameNames('jump', 1, 4), 
-        15, 
-        true
-    );
+    //  Our player animations, turning, walking left and walking right.
+    this.anims.create({
+        key: 'stand',
+        frames: [{ key: 'dude', frame: 'stand1' }],
+        frameRate: 15,
+        repeat: -1
+    });
 
+    this.anims.create({
+        key: 'sprint',
+        frames: this.anims.generateFrameNames('dude', { prefix: 'sprint', start: 1, end: 8 }),
+        frameRate: 15,
+        repeat: -1
+    });
 
+    this.anims.create({
+        key: 'jump',
+        frames: this.anims.generateFrameNames('dude', { prefix: 'jump', start: 1, end: 4 }),
+        frameRate: 15,
+        repeat: 0
+    });
 
-    
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
 
@@ -139,23 +134,9 @@ function create ()
 
     this.physics.add.collider(player, bombs, hitBomb, null, this);
 
-    //  Jump Mechanics
-    this.input.on('cursorDown', this.jump, this);
-    this.input.on('cursorup', this.jump, this);
 
 };
-/*
-endJump()
-{
 
-}
-
-startJump()
-{
-
-
-}
-*/
 function update ()
 {
     if (gameOver)
@@ -166,29 +147,29 @@ function update ()
     if (cursors.left.isDown)
     {
         player.setVelocityX(-160);
-
-        player.animations.play('left', true);
+        player.anims.play('sprint', true);
+        player.setFlipX(true);
     }
     else if (cursors.right.isDown)
     {
         player.setVelocityX(160);
-
-        player.animations.play('right', true);
+        player.anims.play('sprint', true);
+        player.setFlipX(false);
     }
     else
     {
         player.setVelocityX(0);
+        player.anims.play('stand', true);
+    }
 
-        player.animations.play('stand', true);
-    };
-
-    /*
-    if (player.body.touching.down && cursors.up.input)
+    if (cursors.up.isDown && player.body.touching.down)
     {
         player.setVelocityY(-330);
-        player.anims.play('jump')
+        //player.anims.play('jump', true);
     }
-    */
+    else if (!player.body.touching.down) {
+        player.anims.play('jump', true);
+    }
 };
 
 function collectStar (player, star)
@@ -203,9 +184,7 @@ function collectStar (player, star)
     {
         //  A new batch of stars to collect
         stars.children.iterate(function (child) {
-
             child.enableBody(true, child.x, 0, true, true);
-
         });
 
         var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
@@ -215,7 +194,6 @@ function collectStar (player, star)
         bomb.setCollideWorldBounds(true);
         bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
         bomb.allowGravity = true;
-
     }
 };
 
