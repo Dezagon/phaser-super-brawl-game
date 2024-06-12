@@ -102,8 +102,7 @@ function create ()
     this.anims.create({
         key: 'jump',
         frames: this.anims.generateFrameNames('dude', { prefix: 'jump', start: 1, end: 4 }),
-        frameRate: 8,
-        repeat: -1
+        frameRate: 8
     });
 
     //  Input Events
@@ -155,40 +154,32 @@ function update ()
     if (cursors.left.isDown || aKey.isDown)
     {
         player.setVelocityX(-160);
-        player.anims.play('sprint', true);
         player.setFlipX(true);
+        if (player.body.touching.down) {
+            player.anims.play('sprint', true);
+        }
     }
     else if (cursors.right.isDown || dKey.isDown)
     {
         player.setVelocityX(160);
-        player.anims.play('sprint', true);
         player.setFlipX(false);
+        if (player.body.touching.down) {
+            player.anims.play('sprint', true);
+        }
     }
     else
     {
         player.setVelocityX(0);
-        player.anims.play('stand', true);
+        if(player.body.touching.down) {
+            player.anims.play('stand', true);
+        }
     }
 
-    if (cursors.up.isDown || spaceKey.isDown)
+    if ((cursors.up.isDown || spaceKey.isDown) && player.body.touching.down)
     {
-        var jumpCounter = 2
-        
         player.setVelocityY(-330);
         player.anims.play('jump', false);
-        jumpCounter -= 1
-        
     }
-    /*
-    if (cursors.up.isDown && player.body.touching.down)
-    {
-        player.setVelocityY(-330);
-        player.anims.play('jump', true);
-    }
-    else if (!player.body.touching.down) {
-        player.anims.play('jump', true);
-    }
-    */
 };
 
 function collectStar (player, star)
