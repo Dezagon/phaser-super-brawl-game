@@ -144,6 +144,12 @@ function create ()
 
 };
 
+
+
+var jumpCount = 0;
+var maxJump = 2;
+var jumpKeyReleased = true;
+
 function update ()
 {
     if (gameOver)
@@ -170,16 +176,29 @@ function update ()
     else
     {
         player.setVelocityX(0);
-        if(player.body.touching.down) {
+        if (player.body.touching.down) {
             player.anims.play('stand', true);
         }
     }
 
-    if ((cursors.up.isDown || spaceKey.isDown) && player.body.touching.down)
-    {
+    
+    if (player.body.touching.down) {
+        jumpCount = 0;
+        jumpKeyReleased = true;
+    }
+
+    if ( (cursors.up.isDown || spaceKey.isDown) && jumpKeyReleased && (player.body.touching.down || (jumpCount < maxJump) ) ) {
         player.setVelocityY(-330);
         player.anims.play('jump', false);
+        jumpCount++;
+        jumpKeyReleased = false;
     }
+
+    // Check if jump keys are released
+    if (!cursors.up.isDown && !spaceKey.isDown) {
+        jumpKeyReleased = true;
+    }
+    
 };
 
 function collectStar (player, star)
